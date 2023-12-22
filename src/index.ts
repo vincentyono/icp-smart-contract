@@ -3,17 +3,13 @@ import {
   query,
   text,
   update,
-  Void,
   Record,
   Principal,
-  nat,
-  blob,
   Result,
   StableBTreeMap,
   Vec,
   ic,
   nat64,
-  nat8,
   Err,
   Ok,
   nat32,
@@ -75,13 +71,15 @@ export default Canister({
   likeContent: update([Principal], Result(text, text), (id) => {
     if (!currentUser) return Err('You must be logged in...');
 
-    const content = contents.values().filter((c) => c.id === id)[0];
+    const contentOpt = contents.get(id);
 
-    if (!content) return Err('Invalid Principal');
+    if ('None' in contentOpt) return Err('Invalid Principal');
+
+    const content = contentOpt.Some;
 
     const updatedContent: typeof Content.tsType = {
       ...content,
-      dislike: content.dislike + 1,
+      like: content.like + 1,
     };
 
     contents.insert(content.id, updatedContent);
@@ -92,9 +90,11 @@ export default Canister({
   dislikeContent: update([Principal], Result(text, text), (id) => {
     if (!currentUser) return Err('You must be logged in...');
 
-    const content = contents.values().filter((c) => c.id === id)[0];
+    const contentOpt = contents.get(id);
 
-    if (!content) return Err('Invalid Principal');
+    if ('None' in contentOpt) return Err('Invalid Principal');
+
+    const content = contentOpt.Some;
 
     const updatedContent: typeof Content.tsType = {
       ...content,
@@ -128,9 +128,11 @@ export default Canister({
   postComment: update([Principal, text], Result(text, text), (id, comment) => {
     if (!currentUser) return Err('You must be logged in...');
 
-    const content = contents.values().filter((c) => c.id === id)[0];
+    const contentOpt = contents.get(id);
 
-    if (!content) return Err("Content doesn't exist...");
+    if ('None' in contentOpt) return Err('Invalid Principal');
+
+    const content = contentOpt.Some;
 
     const updatedContent: typeof Content.tsType = {
       ...content,
@@ -144,5 +146,9 @@ export default Canister({
 });
 
 function generateId(): Principal {
-  return Principal.fromText(crypto.randomUUID());
+  const randomBytes = new Array(29)
+    .fill(0)
+    .map((_) => Math.floor(Math.random() * 256));
+
+  return Principal.fromUint8Array(Uint8Array.from(randomBytes));
 }

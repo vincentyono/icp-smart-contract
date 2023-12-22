@@ -1,4 +1,10 @@
 service: () -> {
-    getMessage: () -> (text) query;
-    setMessage: (text) -> ();
+    dislikeContent: (principal) -> (variant {Ok:text; Err:text});
+    getContents: () -> (vec record {id:principal; content:text; userId:principal; like:nat32; timestamp:nat64; dislike:nat32; comments:vec text}) query;
+    likeContent: (principal) -> (variant {Ok:text; Err:text});
+    postComment: (principal, text) -> (variant {Ok:text; Err:text});
+    postContent: (text) -> (variant {Ok:text; Err:text});
+    register: (text, text) -> (variant {Ok:text; Err:text});
+    signin: (text, text) -> (variant {Ok:text; Err:text});
+    signout: () -> (variant {Ok:text; Err:text});
 }
