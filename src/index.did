@@ -1,10 +1,24 @@
-service: () -> {
-    dislikeContent: (principal) -> (variant {Ok:text; Err:text});
-    getContents: () -> (vec record {id:principal; content:text; userId:principal; like:nat32; timestamp:nat64; dislike:nat32; comments:vec text}) query;
-    likeContent: (principal) -> (variant {Ok:text; Err:text});
-    postComment: (principal, text) -> (variant {Ok:text; Err:text});
-    postContent: (text) -> (variant {Ok:text; Err:text});
-    register: (text, text) -> (variant {Ok:text; Err:text});
-    signin: (text, text) -> (variant {Ok:text; Err:text});
-    signout: () -> (variant {Ok:text; Err:text});
+type Content = record {
+  id : text;
+  content : text;
+  userId : text;
+  like : nat32;
+  timestamp : nat64;
+  dislike : nat32;
+  comments : vec text;
+};
+type User = record { id : text; username : text; password : text };
+type _AzleResult = variant { Ok : text; Err : text };
+type _AzleResult_1 = variant { Ok : vec Content; Err : text };
+type _AzleResult_2 = variant { Ok : Content; Err : text };
+type _AzleResult_3 = variant { Ok : User; Err : text };
+service : () -> {
+  dislikeContent : (text, text) -> (_AzleResult);
+  getContents : () -> (_AzleResult_1) query;
+  likeContent : (text, text) -> (_AzleResult);
+  postComment : (text, text, text) -> (_AzleResult_2);
+  postContent : (text, text) -> (_AzleResult_2);
+  register : (text, text) -> (_AzleResult_3);
+  signin : (text, text) -> (_AzleResult);
+  signout : () -> (_AzleResult);
 }
